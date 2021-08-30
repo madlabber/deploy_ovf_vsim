@@ -1,0 +1,220 @@
+---
+- name: locate ovf ovf_file
+  stat:
+    path: "{{ovf_file | default('')}}" 
+  delegate_to: localhost
+  register: ovf_location
+
+- name: Check althernate ovf_file location
+  stat: 
+    path: "{{playbook_dir}}/files/vsim-netapp-DOT{{ovf_version}}-cm_nodar.ova"
+  delegate_to: localhost
+  register: ovf_playbook_dir
+  when: not ovf_location.stat.exists
+
+- name: select ovf_file
+  set_fact: 
+    ovf_file: "{{playbook_dir}}/files/vsim-netapp-DOT{{ovf_version}}-cm_nodar.ova"
+  when:
+    - not ovf_location.stat.exists
+    - ovf_playbook_dir.stat.exists
+
+- name: select cluster network
+  set_fact:
+    cluster_network: "{{ data_network }}"
+  when:
+    - (cluster_network is undefined) or (cluster_network == "")
+
+- name: generate sysid
+  set_fact:
+    nvram_sysid: "4082{{ 9 | random(start=0) }}{{ 9 | random(start=0) }}{{ 9 | random(start=0) }}{{ 9 | random(start=0) }}07" #the two current options are 408236507, or 4034389062
+  when: nvram_sysid == ""
+
+- name: 'Deploy ovf file: {{ovf_file}}' 
+  vmware_deploy_ovf:
+    hostname: '{{ vcenter_address }}'
+    username: '{{ vcenter_username }}'
+    password: '{{ vcenter_password }}'    
+    validate_certs: no 
+    datacenter: "{{vcenter_datacenter}}"
+    cluster: '{{ vcenter_cluster }}'
+    datastore: "{{vm_datastore}}"
+    name: "{{vm_name}}"
+    ovf: "{{ovf_file}}"
+    disk_provisioning: "{{vm_disk_provisioning}}"
+    power_on: no
+    networks: "{u'hostonly':u'{{ cluster_network }}',u'nat':u'{{ data_network }}'}"
+    wait_for_ip_address: false
+  delegate_to: localhost
+  retries: 10
+  delay: 60
+  register: result           
+  until: result is succeeded 
+
+- name: Adjust VM Sizing
+  vmware_guest:
+    hostname: '{{ vcenter_address }}'
+    username: '{{ vcenter_username }}'
+    password: '{{ vcenter_password }}'    
+    validate_certs: no 
+    name: '{{ vm_name }}'
+    state: present
+    hardware:
+      memory_mb: "{{ vm_memory_mb}}"
+      num_cpus: '{{ vm_num_cpus }}'
+    # customvalues:
+    #   - key: pciHole.start
+    #     value: 1024  # Moving the PCI hole here gives ONTAP access to more system ram
+  delegate_to: localhost
+
+- name: Start VM
+  vmware_guest:
+    hostname: '{{ vcenter_address }}'
+    username: '{{ vcenter_username }}'
+    password: '{{ vcenter_password }}'    
+    validate_certs: no 
+    name: '{{ vm_name }}'
+    state: poweredon
+    wait_for_ip_address: false
+  delegate_to: localhost
+
+- name: Wait for 5 seconds
+  wait_for: timeout=5
+  delegate_to: localhost
+
+- name: Press Space to interrupt autoboot
+  community.vmware.vmware_guest_sendkey:
+    hostname: '{{ vcenter_address }}'
+    username: '{{ vcenter_username }}'
+    password: '{{ vcenter_password }}'    
+    validate_certs: no 
+    name: "{{ vm_name }}"
+    keys_send: '{{item}}'
+  delegate_to: localhost
+  loop: [ SPACE, SPACE, SPACE, SPACE, SPACE ]
+
+- name: configure loader variable via sendkeys
+  community.vmware.vmware_guest_sendkey:
+    hostname: '{{ vcenter_address }}'
+    username: '{{ vcenter_username }}'
+    password: '{{ vcenter_password }}'    
+    validate_certs: no 
+    name: "{{ vm_name }}"
+    keys_send: ENTER
+    string_send: "{{item}}"
+  delegate_to: localhost
+  loop: 
+    - "setenv SYS_SERIAL_NUMBER {{sys_serial_number}}"
+    - "setenv bootarg.nvram.sysid {{nvram_sysid}}"
+    - "setenv bootarg.vm.sim.vdevinit {{vdevinit}}"
+    - "setenv bootarg.sim.vdevinit {{vdevinit}}"
+    - "" # this is here to force the enter key after the preceding command
+
+- name: boot_ontap
+  community.vmware.vmware_guest_sendkey:
+    hostname: '{{ vcenter_address }}'
+    username: '{{ vcenter_username }}'
+    password: '{{ vcenter_password }}'    
+    validate_certs: no 
+    name: "{{ vm_name }}"
+    keys_send: ENTER
+    string_send: "{{item}}"
+  delegate_to: localhost
+  loop: 
+    - "boot_ontap"
+    - "" # this is here to force the enter key after the preceding command
+
+- name: Wait for VMware tools to become available
+  community.vmware.vmware_guest_tools_wait:
+    hostname: '{{ vcenter_address }}'
+    username: '{{ vcenter_username }}'
+    password: '{{ vcenter_password }}'     
+    validate_certs: no 
+    name: '{{ vm_name }}'
+  delegate_to: localhost
+  retries: 3
+  delay: 15
+  register: result           
+  until: result is succeeded 
+
+- name: Run node setup
+  block:
+  # vmware tools come up a little early so we need to pause for a bit
+  - name: Wait for 30 seconds for Startup to Complete
+    wait_for: timeout=30
+    delegate_to: localhost
+    when: ontap_node_mgmt_ip != "" 
+
+  # Send keys via HID to complete setup at the vidconsole
+  - name: Complete Node Setup
+    community.vmware.vmware_guest_sendkey:
+      hostname: '{{ vcenter_address }}'
+      username: '{{ vcenter_username }}'
+      password: '{{ vcenter_password }}'     
+      validate_certs: no 
+      name: "{{ vm_name }}"
+      keys_send: ENTER
+      string_send: "{{item}}"
+    delegate_to: localhost
+    loop: 
+      - "admin"
+      - "cluster setup"
+      - "yes"
+      - "e0c" # node mgmt port
+      - "{{ontap_node_mgmt_ip}}"
+      - "{{ontap_netmask}}"
+      - "{{ontap_gateway}}"
+      - "" # this completes the node setup phase
+
+  when: ontap_node_mgmt_ip != ""
+# block:end
+- name: Run cluster setup
+  block:
+
+  - name: Begin cluster setup
+    community.vmware.vmware_guest_sendkey:
+      hostname: '{{ vcenter_address }}'
+      username: '{{ vcenter_username }}'
+      password: '{{ vcenter_password }}'     
+      validate_certs: no 
+      name: "{{ vm_name }}"
+      keys_send: ENTER
+      string_send: "{{item}}"
+    delegate_to: localhost
+    loop: 
+      - "create" # operation create|join
+      - "no" # single node cluster yes|no
+      - "yes" # use default cluster lif configuration
+      - "{{ontap_password}}"
+      - "{{ontap_password}}" # confirm password
+      - "{{ontap_cluster_name | default(vm_name) }}"
+      - "" # This is here to force the enter key to be pressed
+
+  - name: Wait 120 seconds for cluster setup
+    wait_for: timeout=120
+    delegate_to: localhost
+
+  - name: Complete cluster setup
+    community.vmware.vmware_guest_sendkey:
+      hostname: '{{ vcenter_address }}'
+      username: '{{ vcenter_username }}'
+      password: '{{ vcenter_password }}'     
+      validate_certs: no 
+      name: "{{vm_name}}"
+      keys_send: ENTER
+      string_send: "{{item}}"
+    delegate_to: localhost
+    loop: 
+      - "e0c" # cluster mgmt port
+      - "{{ontap_cluster_mgmt_ip}}"
+      - "{{ontap_netmask}}"
+      - "{{ontap_gateway}}"
+      - "{{ontap_dns_domain}}" 
+      - "{{ontap_dns_server}}"
+      - "{{ontap_location}}" # single node cluster yes|no
+      - "" # this is here to force the enter key after the preceding command
+  when: ontap_cluster_mgmt_ip != ""
+
+
+
+
