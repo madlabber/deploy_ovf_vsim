@@ -22,6 +22,7 @@ Role Variables
 | vm_disk_provisioning    |          | "thin"            |                                 | Virtual Disk provisioning mode                                               |
 | vm_num_cpus             |          | "2"               | "2"                             | number of vCPUs to assign to the VM                                          |
 | vm_memory_mb            |          | "8192"            | "8192"                          | amount of memory, in MB, to assign to the VM                                 |
+| vm_num_nics             |          | "4"               | "8"                             | number of nics to create on the VM (4-10)                                    |
 | vcenter_address         | yes      |                   | "vc.demo.lab"                   | The hostname or IP address of the vCenter server                             |
 | vcenter_username        | yes      |                   | "administrator@vsphere.local"   | A vcenter username with rights to deploy the OVA                             |
 | vcenter_password        | yes      |                   | "ChangeMe2!"                    | The password for the vcenter user                                            |
@@ -41,6 +42,7 @@ Role Variables
 | ontap_dns_domain        |          |                   |                                 | DNS domain                                                                   | 
 | ontap_dns_server        |          |                   |                                 | DNS Server on the data/mgmt network                                          |
 | ontap_location          |          |                   |                                 | optional ONTAP SNMP location value used for cluster setup                    |
+| set_admin_password      |          | "false"           | "true"                          | set admin password even on unconfigured nodes                                |
 
 Dependencies
 ------------

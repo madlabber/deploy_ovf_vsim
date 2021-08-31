@@ -14,6 +14,7 @@ ovf_file:    "{{role_path}}/files/vsim-netapp-DOT{{ovf_version}}-cm_nodar.ova"
 vm_name:         "SimulateONTAP"
 vm_num_cpus:     "2"
 vm_memory_mb:    "8192"
+vm_num_nics:     "4"
 vm_disk_provisioning: thin
 data_network:    "VM Network"
 # if cluster network is unspecified, the cluster ports will be conneted to the data network

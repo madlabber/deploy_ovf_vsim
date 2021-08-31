@@ -67,6 +67,24 @@
     #     value: 1024  # Moving the PCI hole here gives ONTAP access to more system ram
   delegate_to: localhost
 
+- name: add nics
+  community.vmware.vmware_guest_network:
+    hostname: "{{ vcenter_address }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    # datacenter: "{{ vcenter_datacenter }}"
+    name: '{{ vm_name }}'
+    state: present
+    force: yes
+    device_type:  "e1000"
+    network_name: "{{ data_network }}"
+    connected: true
+    start_connected: true
+  delegate_to: localhost
+  with_sequence: start=5 end="{{ vm_num_nics }}"
+  when:
+    vm_num_nics != "4"
+
 - name: Start VM
   vmware_guest:
     hostname: '{{ vcenter_address }}'
@@ -78,8 +96,8 @@
     wait_for_ip_address: false
   delegate_to: localhost
 
-- name: Wait for 5 seconds
-  wait_for: timeout=5
+- name: Wait for 10 seconds
+  wait_for: timeout=10
   delegate_to: localhost
 
 - name: Press Space to interrupt autoboot
@@ -140,8 +158,8 @@
 - name: 'Run node setup on {{vm_name}}'
   block:
   # vmware tools come up a little early so we need to pause for a bit
-  - name: Wait for 30 seconds for Startup to Complete
-    wait_for: timeout=30
+  - name: Wait for 60 seconds for Startup to Complete
+    wait_for: timeout=60
     delegate_to: localhost
     when: ontap_node_mgmt_ip != "" 
 
