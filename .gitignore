@@ -1,4 +1,5 @@
 .DS_Store
 ._*
-.ova
-.OVA
+*.ova
+*.OVA
+test/private.yml
