@@ -2,6 +2,9 @@
 ovf_version: "9.9.1"
 ovf_file:    "{{role_path}}/files/vsim-netapp-DOT{{ovf_version}}-cm_nodar.ova"
 
+# Default action is to create.  
+state: "present"
+
 # vSphere Information
 # vcenter_address: "vcenter.demo.lab"
 # vcenter_username: "administrator@vsphere.local"

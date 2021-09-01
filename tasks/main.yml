@@ -1,4 +1,27 @@
 ---
+- name: remove if absent
+  block:
+    - name: Remove VM
+      vmware_guest:
+        hostname: '{{ vcenter_address }}'
+        username: '{{ vcenter_username }}'
+        password: '{{ vcenter_password }}'    
+        validate_certs: no 
+        name: '{{ vm_name }}'
+        state: absent
+        force: yes
+        # hardware:
+        #   memory_mb: "{{ vm_memory_mb}}"
+        #   num_cpus: '{{ vm_num_cpus }}'
+        # # customvalues:
+        # #   - key: pciHole.start
+        # #     value: 1024  # Moving the PCI hole here gives ONTAP access to more system ram
+      delegate_to: localhost
+    - meta: end_host
+
+  when: state == "absent"
+  #end block
+
 - name: locate ovf ovf_file
   stat:
     path: "{{ovf_file | default('')}}" 
@@ -67,23 +90,11 @@
     #     value: 1024  # Moving the PCI hole here gives ONTAP access to more system ram
   delegate_to: localhost
 
+# This wierdness is because with_sequence evaluates and fails even when this task is not executed
+# bug closed as a wont_fix by ansible
 - name: add nics
-  community.vmware.vmware_guest_network:
-    hostname: "{{ vcenter_address }}"
-    username: "{{ vcenter_username }}"
-    password: "{{ vcenter_password }}"
-    # datacenter: "{{ vcenter_datacenter }}"
-    name: '{{ vm_name }}'
-    state: present
-    force: yes
-    device_type:  "e1000"
-    network_name: "{{ data_network }}"
-    connected: true
-    start_connected: true
-  delegate_to: localhost
-  with_sequence: start=5 end="{{ vm_num_nics }}"
-  when:
-    vm_num_nics != "4"
+  include_tasks: add_nics
+  when: vm_num_nics|int > 4
 
 - name: Start VM
   vmware_guest:

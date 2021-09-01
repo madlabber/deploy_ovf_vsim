@@ -15,6 +15,7 @@ Role Variables
 
 | Variable                | Required | Default           | Example                         | Comments                                                                     |
 |-------------------------|----------|-------------------|---------------------------------|------------------------------------------------------------------------------|
+| state                   |          | "present"         | "absent"                        | present creates VMs, absent deletes them.
 | vm_name                 |          | "SimulateONTAP"   | "vsim1"                         | a valid VM name                                                              |
 | vm_datastore            | yes      |                   | "datastore1"                    | the VMware datastore where the node will be placed                           |
 | data_network            |          | "VM Network"      | "pgVLAN1"                       | The vSphere portgroup used for ONTAP data and mgmt traffic                   |
@@ -58,14 +59,13 @@ Example Playbook
         vcenter_address: vcenter.demo.lab
         vcenter_username: administrator@vsphere.local
         vcenter_password: ChangeMe2!
-        vcenter_datacenter: "Datacenter 1"
+        vcenter_datacenter: "Datacenter"
         vm_datastore: "datastore1"
       tasks:
         - include_role: 
             name: deploy_ovf_vsim
           vars:
             vm_name: vsim1
-            sys_serial_number: "4034389-06-2"
             ontap_node_mgmt_ip: "192.168.0.91"
             ontap_netmask: "255.255.255.0"
             ontap_gateway: "192.168.0.1"
