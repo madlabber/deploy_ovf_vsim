@@ -133,7 +133,7 @@
     string_send: "{{item}}"
   delegate_to: localhost
   loop: 
-    - "setenv SYS_SERIAL_NUMBER {{sys_serial_number}}"
+    - "setenv SYS_SERIAL_NUM {{sys_serial_number}}"
     - "setenv bootarg.nvram.sysid {{nvram_sysid}}"
     - "setenv bootarg.vm.sim.vdevinit {{vdevinit}}"
     - "setenv bootarg.sim.vdevinit {{vdevinit}}"
