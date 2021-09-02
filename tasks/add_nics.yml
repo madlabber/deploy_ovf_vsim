@@ -7,6 +7,7 @@
         hostname: "{{ vcenter_address }}"
         username: "{{ vcenter_username }}"
         password: "{{ vcenter_password }}"
+        validate_certs: no
         # datacenter: "{{ vcenter_datacenter }}"
         name: '{{ vm_name }}'
         state: present
