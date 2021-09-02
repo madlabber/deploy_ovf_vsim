@@ -6,9 +6,13 @@ Deploys NetApp ONTAP Simulator (vsims) virtual appliances.
 Requirements
 ------------
 
-Requires the vsim-netapp-DOT{{ovf_version}}-cm_nodar.ova virtual appliance downloaded from NetApp.com.  Store the archive in either the role's files directory, or the playbook's files directory.
-Requires the community.vmware ansible galaxy collection.
-Requires pyvmoni.
+- Requires the vsim-netapp-DOT{{ovf_version}}-cm_nodar.ova virtual appliance downloaded from NetApp.com.  \n
+
+Store the archive in either the role's files directory, or the playbook's files directory.
+
+- Requires the community.vmware ansible galaxy collection.
+
+- Requires pyvmoni.
 
 Role Variables
 --------------
@@ -44,18 +48,18 @@ Role Variables
 | ontap_dns_server        |          |                   |                                 | DNS Server on the data/mgmt network                                          |
 | ontap_location          |          |                   |                                 | optional ONTAP SNMP location value used for cluster setup                    |
 | set_admin_password      |          | "false"           | "true"                          | set admin password even on unconfigured nodes                                |
-|shelf0_disk_count        |
-|shelf0_disk_size         |
-|shelf0_disk_type         |
-|shelf1_disk_count        |
-|shelf1_disk_size         |
-|shelf1_disk_type         |
-|shelf2_disk_count        |
-|shelf2_disk_size         |
-|shelf2_disk_type         |
-|shelf3_disk_count        |
-|shelf3_disk_size         |
-|shelf3_disk_type         |
+| shelf0_disk_count       |          |                   | "14"                            | (1-14) Number of disks to create on shelf 0                                  |
+| shelf0_disk_size        |          |                   | "4000"                          | valid sizes are 500,1000,2000,4000, or 9000                                  |
+| shelf0_disk_type        |          |                   |                                 | valid type from 'vsim_makedisks -h'. See defaults/main.yml for examples.     |
+| shelf1_disk_count       |          |                   | "14"                            | (1-14) Number of disks to create on shelf 1                                  |
+| shelf1_disk_size        |          |                   | "4000"                          | valid sizes are 500,1000,2000,4000, or 9000                                  |
+| shelf1_disk_type        |          |                   |                                 | valid type from 'vsim_makedisks -h'. See defaults/main.yml for examples.     |
+| shelf2_disk_count       |          |                   |                                 | (1-14) Number of disks to create on shelf 2                                  |
+| shelf2_disk_size        |          |                   | "14"                            | valid sizes are 500,1000,2000,4000, or 9000                                  |
+| shelf2_disk_type        |          |                   | "23"                            | valid type from 'vsim_makedisks -h'. See defaults/main.yml for examples.     |
+| shelf3_disk_count       |          |                   |                                 | (1-14) Number of disks to create on shelf 3                                  |
+| shelf3_disk_size        |          |                   |                                 | valid sizes are 500,1000,2000,4000, or 9000                                  |
+| shelf3_disk_type        |          |                   |                                 | valid type from 'vsim_makedisks -h'. See defaults/main.yml for examples.     |
 
 
 Dependencies

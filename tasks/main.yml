@@ -1,26 +1,18 @@
 ---
-- name: remove if absent
-  block:
-    - name: Remove VM
-      vmware_guest:
-        hostname: '{{ vcenter_address }}'
-        username: '{{ vcenter_username }}'
-        password: '{{ vcenter_password }}'    
-        validate_certs: no 
-        name: '{{ vm_name }}'
-        state: absent
-        force: yes
-        # hardware:
-        #   memory_mb: "{{ vm_memory_mb}}"
-        #   num_cpus: '{{ vm_num_cpus }}'
-        # # customvalues:
-        # #   - key: pciHole.start
-        # #     value: 1024  # Moving the PCI hole here gives ONTAP access to more system ram
-      delegate_to: localhost
-    - meta: end_host
+- name: remove if absent or forced
+  vmware_guest:
+    hostname: '{{ vcenter_address }}'
+    username: '{{ vcenter_username }}'
+    password: '{{ vcenter_password }}'    
+    validate_certs: no 
+    name: '{{ vm_name }}'
+    state: absent
+    force: yes
+  delegate_to: localhost
+  when: state == "absent" or force
 
+- meta: end_host
   when: state == "absent"
-  #end block
 
 - name: locate ovf ovf_file
   stat:
