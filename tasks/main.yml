@@ -53,6 +53,71 @@
     nvram_sysid: "4082{{ 9 | random(start=0) }}{{ 9 | random(start=0) }}{{ 9 | random(start=0) }}{{ 9 | random(start=0) }}07" #the two current options are 408236507, or 4034389062
   when: nvram_sysid == ""
 
+- name: parse vdevinit
+  set_fact:
+    shelf0_type:    '{{  (vdevinit.split(",")[0] | default("31:14:0")).split(":")[0] | default("31")}}'  
+    shelf0_qty:     '{{  (vdevinit.split(",")[0] | default("31:14:0")).split(":")[1] | default("14")}}' 
+    shelf0_shelf:   '{{  (vdevinit.split(",")[0] | default("31:14:0")).split(":")[2] | default("0")}}'   
+    shelf1_type:    '{{  (vdevinit.split(",")[1] | default("31:0:1")).split(":")[0] | default("")}}'  
+    shelf1_qty:     '{{  (vdevinit.split(",")[1] | default("31:0:1")).split(":")[1] | default("")}}' 
+    shelf1_shelf:   '{{  (vdevinit.split(",")[1] | default("31:0:1")).split(":")[2] | default("")}}'      
+    shelf2_type:    '{{  (vdevinit.split(",")[2] | default("31:0:2")).split(":")[0] | default("")}}'  
+    shelf2_qty:     '{{  (vdevinit.split(",")[2] | default("31:0:2")).split(":")[1] | default("")}}' 
+    shelf2_shelf:   '{{  (vdevinit.split(",")[2] | default("31:0:2")).split(":")[2] | default("")}}'  
+    shelf3_type:    '{{  (vdevinit.split(",")[3] | default("31:0:3")).split(":")[0] | default("")}}'  
+    shelf3_qty:     '{{  (vdevinit.split(",")[3] | default("31:0:3")).split(":")[1] | default("")}}' 
+    shelf3_shelf:   '{{  (vdevinit.split(",")[3] | default("31:0:3")).split(":")[2] | default("")}}'   
+- name: debug
+  debug:
+    msg:
+      - 'Shelf: {{  shelf0_shelf }}, qty: {{  shelf0_qty }}, type: {{  shelf0_type }}'
+      - 'Shelf: {{  shelf1_shelf }}, qty: {{  shelf1_qty }}, type: {{  shelf1_type }}'
+      - 'Shelf: {{  shelf2_shelf }}, qty: {{  shelf2_qty }}, type: {{  shelf2_type }}'
+      - 'Shelf: {{  shelf3_shelf }}, qty: {{  shelf3_qty }}, type: {{  shelf3_type }}'
+  ignore_errors: true
+
+- name: size table
+  set_fact:
+    size_table: {
+      '500': '35',
+      '1000': '23',
+      '2000': '30',
+      '4000': '31',
+      '9000': '36'
+    }
+
+- name: assemble vdevinit shelf0
+  set_fact:
+    vdevinit: "{{ size_table[shelf0_disk_size|default('')]|default(shelf0_type) }},\
+               {{ shelf0_disk_count|default(shelf0_qty) }},\
+               {{ shelf0_shelf }}"
+  when: shelf0_disk_count|default(shelf0_qty)|int >0
+- name: assemble vdevinit shelf1
+  set_fact:
+    vdevinit: "{{ vdevinit }}:\
+               {{ size_table[shelf1_disk_size|default('')]|default(shelf1_type) }},\
+               {{ shelf1_disk_count|default(shelf1_qty) }},\
+               {{ shelf1_shelf }}"
+  when: shelf1_disk_count|default(shelf1_qty)|int >0
+- name: assemble vdevinit shelf2
+  set_fact:
+    vdevinit: "{{ vdevinit }}:\
+               {{ size_table[shelf2_disk_size|default('')]|default(shelf2_type) }},\
+               {{ shelf2_disk_count|default(shelf2_qty) }},\
+               {{ shelf2_shelf }}"
+  when: shelf2_disk_count|default(shelf2_qty)|int >0
+- name: assemble vdevinit shelf3
+  set_fact:
+    vdevinit: "{{ vdevinit }}:\
+               {{ size_table[shelf3_disk_size|default('')]|default(shelf3_type) }},\
+               {{ shelf3_disk_count|default(shelf3_qty) }},\
+               {{ shelf3_shelf }}"
+  when: shelf3_disk_count|default(shelf3_qty)|int >0
+- debug:
+    msg: "{{vdevinit}}"
+
+- meta: end_host
+
 - name: 'Deploy ovf file: {{ovf_file}}' 
   vmware_deploy_ovf:
     hostname: '{{ vcenter_address }}'

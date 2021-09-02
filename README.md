@@ -44,6 +44,19 @@ Role Variables
 | ontap_dns_server        |          |                   |                                 | DNS Server on the data/mgmt network                                          |
 | ontap_location          |          |                   |                                 | optional ONTAP SNMP location value used for cluster setup                    |
 | set_admin_password      |          | "false"           | "true"                          | set admin password even on unconfigured nodes                                |
+|shelf0_disk_count        |
+|shelf0_disk_size         |
+|shelf0_disk_type         |
+|shelf1_disk_count        |
+|shelf1_disk_size         |
+|shelf1_disk_type         |
+|shelf2_disk_count        |
+|shelf2_disk_size         |
+|shelf2_disk_type         |
+|shelf3_disk_count        |
+|shelf3_disk_size         |
+|shelf3_disk_type         |
+
 
 Dependencies
 ------------
