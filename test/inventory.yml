@@ -23,3 +23,8 @@ all:
         ontap_version: "9.9.1"
         ontap_netmask: "255.255.255.0"
         ontap_gateway: "192.168.0.1"
+        shelf0_disk_count: 14
+        shelf0_disk_size: 4000
+        shelf1_disk_count: 14
+        shelf1_disk_size: 4000
+        

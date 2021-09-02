@@ -53,6 +53,16 @@
     nvram_sysid: "4082{{ 9 | random(start=0) }}{{ 9 | random(start=0) }}{{ 9 | random(start=0) }}{{ 9 | random(start=0) }}07" #the two current options are 408236507, or 4034389062
   when: nvram_sysid == ""
 
+- name: size table
+  set_fact:
+    size_table: {
+      '500': '35',
+      '1000': '23',
+      '2000': '30',
+      '4000': '31',
+      '9000': '36'
+    }
+
 - name: parse vdevinit
   set_fact:
     shelf0_type:    '{{  (vdevinit.split(",")[0] | default("31:14:0")).split(":")[0] | default("31")}}'  
@@ -67,24 +77,30 @@
     shelf3_type:    '{{  (vdevinit.split(",")[3] | default("31:0:3")).split(":")[0] | default("")}}'  
     shelf3_qty:     '{{  (vdevinit.split(",")[3] | default("31:0:3")).split(":")[1] | default("")}}' 
     shelf3_shelf:   '{{  (vdevinit.split(",")[3] | default("31:0:3")).split(":")[2] | default("")}}'   
-- name: debug
-  debug:
-    msg:
-      - 'Shelf: {{  shelf0_shelf }}, qty: {{  shelf0_qty }}, type: {{  shelf0_type }}'
-      - 'Shelf: {{  shelf1_shelf }}, qty: {{  shelf1_qty }}, type: {{  shelf1_type }}'
-      - 'Shelf: {{  shelf2_shelf }}, qty: {{  shelf2_qty }}, type: {{  shelf2_type }}'
-      - 'Shelf: {{  shelf3_shelf }}, qty: {{  shelf3_qty }}, type: {{  shelf3_type }}'
-  ignore_errors: true
-
-- name: size table
-  set_fact:
-    size_table: {
-      '500': '35',
-      '1000': '23',
-      '2000': '30',
-      '4000': '31',
-      '9000': '36'
-    }
+# - name: debug
+#   debug:
+#     msg:
+#       - 'Shelf: {{  shelf0_shelf }}, qty: {{  shelf0_qty }}, type: {{  shelf0_type }}'
+#       - 'Shelf: {{  shelf1_shelf }}, qty: {{  shelf1_qty }}, type: {{  shelf1_type }}'
+#       - 'Shelf: {{  shelf2_shelf }}, qty: {{  shelf2_qty }}, type: {{  shelf2_type }}'
+#       - 'Shelf: {{  shelf3_shelf }}, qty: {{  shelf3_qty }}, type: {{  shelf3_type }}'
+#   ignore_errors: true
+- name: default shelf0_qty
+  set_fact: 
+    shelf0_qty: 14
+  when: size_table[shelf0_disk_size|default('')]|default('')|int > 0 and shelf0_qty|int == 0
+- name: default shelf1_qty
+  set_fact: 
+    shelf1_qty: 14
+  when: size_table[shelf1_disk_size|default('')]|default('')|int > 0 and shelf1_qty|int == 0
+- name: default shelf2_qty
+  set_fact: 
+    shelf2_qty: 14
+  when: size_table[shelf2_disk_size|default('')]|default('')|int > 0 and shelf2_qty|int == 0
+- name: default shelf3_qty
+  set_fact: 
+    shelf3_qty: 14
+  when: size_table[shelf3_disk_size|default('')]|default('')|int > 0 and shelf3_qty|int == 0
 
 - name: assemble vdevinit shelf0
   set_fact:
@@ -116,7 +132,7 @@
 - debug:
     msg: "{{vdevinit}}"
 
-- meta: end_host
+# - meta: end_host
 
 - name: 'Deploy ovf file: {{ovf_file}}' 
   vmware_deploy_ovf:
