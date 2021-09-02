@@ -96,29 +96,29 @@
 
 - name: assemble vdevinit shelf0
   set_fact:
-    vdevinit: "{{ size_table[shelf0_disk_size|default('')]|default(shelf0_type) }},\
-               {{ shelf0_disk_count|default(shelf0_qty) }},\
+    vdevinit: "{{ size_table[shelf0_disk_size|default('')]|default(shelf0_type) }}:\
+               {{ shelf0_disk_count|default(shelf0_qty) }}:\
                {{ shelf0_shelf }}"
   when: shelf0_disk_count|default(shelf0_qty)|int >0
 - name: assemble vdevinit shelf1
   set_fact:
-    vdevinit: "{{ vdevinit }}:\
-               {{ size_table[shelf1_disk_size|default('')]|default(shelf1_type) }},\
-               {{ shelf1_disk_count|default(shelf1_qty) }},\
+    vdevinit: "{{ vdevinit }},\
+               {{ size_table[shelf1_disk_size|default('')]|default(shelf1_type) }}:\
+               {{ shelf1_disk_count|default(shelf1_qty) }}:\
                {{ shelf1_shelf }}"
   when: shelf1_disk_count|default(shelf1_qty)|int >0
 - name: assemble vdevinit shelf2
   set_fact:
-    vdevinit: "{{ vdevinit }}:\
-               {{ size_table[shelf2_disk_size|default('')]|default(shelf2_type) }},\
-               {{ shelf2_disk_count|default(shelf2_qty) }},\
+    vdevinit: "{{ vdevinit }},\
+               {{ size_table[shelf2_disk_size|default('')]|default(shelf2_type) }}:\
+               {{ shelf2_disk_count|default(shelf2_qty) }}:\
                {{ shelf2_shelf }}"
   when: shelf2_disk_count|default(shelf2_qty)|int >0
 - name: assemble vdevinit shelf3
   set_fact:
-    vdevinit: "{{ vdevinit }}:\
-               {{ size_table[shelf3_disk_size|default('')]|default(shelf3_type) }},\
-               {{ shelf3_disk_count|default(shelf3_qty) }},\
+    vdevinit: "{{ vdevinit }},\
+               {{ size_table[shelf3_disk_size|default('')]|default(shelf3_type) }}:\
+               {{ shelf3_disk_count|default(shelf3_qty) }}:\
                {{ shelf3_shelf }}"
   when: shelf3_disk_count|default(shelf3_qty)|int >0
 - debug:

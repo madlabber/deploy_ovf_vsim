@@ -29,6 +29,9 @@ sys_serial_number:  "4082368-50-7"
 # SYSID will be auto-generated if not specified
 nvram_sysid: ''
 
+# Type of simulated disk subsystem.  Only VHA is supported for now
+disk_model: "vha"  # "vha", "vscsi"
+
 # Virtual (simulated) Disk Devices to create during init
 # type:qty:shelf,type:qty:shelf,type:qty:shelf,type:qty:shelf
 # Shelves 0-3 may be populated
