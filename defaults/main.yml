@@ -5,6 +5,7 @@ ovf_file:    "{{role_path}}/files/vsim-netapp-DOT{{ovf_version}}-cm_nodar.ova"
 # Default action is to create.  
 state: "present"
 force: no
+console_muted: true
 
 # vSphere Information
 # vcenter_address: "vcenter.demo.lab"
