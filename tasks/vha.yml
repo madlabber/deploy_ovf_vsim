@@ -225,7 +225,7 @@
   delegate_to: localhost
   loop: 
     - "setenv bootarg.template.use_node_uuids true"
-    - "setenv bootarg.bootmenu.node_uuid {{(ontap_cluster_name+vm_name)|to_uuid}}"
+    - "setenv bootarg.bootmenu.node_uuid {{(ontap_cluster_name|default(vm_name)+vm_name)|to_uuid}}"
     #- "setenv bootarg.mgwd.nblade_uuid {{(ontap_cluster_name+vm_name)|to_uuid}}"
     - "" # this is here to force the enter key after the preceding command
   # when: 
