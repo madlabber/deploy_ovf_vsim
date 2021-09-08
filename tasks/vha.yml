@@ -158,9 +158,9 @@
     hardware:
       memory_mb: "{{ vm_memory_mb}}"
       num_cpus: '{{ vm_num_cpus }}'
-    # customvalues:
-    #   - key: pciHole.start
-    #     value: 1024  # Moving the PCI hole here gives ONTAP access to more system ram
+    customvalues:
+      - key: pciHole.start
+        value: 1024  # Moving the PCI hole here gives ONTAP access to more system ram
   delegate_to: localhost
 
 # This wierdness is because with_sequence evaluates and fails even when this task is not executed
@@ -211,26 +211,27 @@
     - "setenv bootarg.vm.sim.vdevinit {{vdevinit}}"
     - "setenv bootarg.sim.vdevinit {{vdevinit}}"
     - "" # this is here to force the enter key after the preceding command
-  when: console_muted == "false"
 
-- name: configure node_uuid
-  community.vmware.vmware_guest_sendkey:
-    hostname: '{{ vcenter_address }}'
-    username: '{{ vcenter_username }}'
-    password: '{{ vcenter_password }}'    
-    validate_certs: no 
-    name: "{{ vm_name }}"
-    keys_send: ENTER
-    string_send: "{{item}}"
-  delegate_to: localhost
-  loop: 
-    - "setenv bootarg.template.use_node_uuids true"
-    - "setenv bootarg.bootmenu.node_uuid {{(ontap_cluster_name|default(vm_name)+vm_name)|to_uuid}}"
-    #- "setenv bootarg.mgwd.nblade_uuid {{(ontap_cluster_name+vm_name)|to_uuid}}"
-    - "" # this is here to force the enter key after the preceding command
-  # when: 
-  #   - node_uuid is defined
-  #   - node_uuid != ""
+# none of this worked. stubbing.
+# - name: configure node_uuid
+#   community.vmware.vmware_guest_sendkey:
+#     hostname: '{{ vcenter_address }}'
+#     username: '{{ vcenter_username }}'
+#     password: '{{ vcenter_password }}'    
+#     validate_certs: no 
+#     name: "{{ vm_name }}"
+#     keys_send: ENTER
+#     string_send: "{{item}}"
+#   delegate_to: localhost
+#   loop: 
+#   #  - "setenv bootarg.template.use_node_uuids true"
+#     - "setenv bootarg.bootmenu.node_uuid bf5ff7fc-10bc-11ec-ba72-005056a201aa"
+#     - "setenv bootarg.mgwd.nblade_uuid bf5e90b2-10dc-11ec-ba72-005056a201aa"
+#   #  - "setenv bootarg.bootmenu.node_uuid {{(ontap_cluster_name|default(vm_name)+vm_name)|to_uuid}}"
+#   #  - "setenv bootarg.mgwd.nblade_uuid {{(ontap_cluster_name+vm_name+'nblade')|to_uuid}}"
+#     - "" # this is here to force the enter key after the preceding command
+#   # when: 
+#   #   - use_node_uuids|default(false)
 
 - name: verbose console
   community.vmware.vmware_guest_sendkey:
@@ -246,6 +247,8 @@
     - "setenv boot_verbose true"
     - "setenv bootarg.init.console_muted false"
     - ""
+  when:
+    - not console_muted|default(true)
 
 - name: boot_ontap
   community.vmware.vmware_guest_sendkey:
@@ -372,7 +375,53 @@
       - "{{ontap_dns_server}}"
       - "{{ontap_location}}" # single node cluster yes|no
       - "" # this is here to force the enter key after the preceding command
+
+#add_nodes_by_serial      
+  - name: add-node-test
+    community.vmware.vmware_guest_sendkey:
+      hostname: '{{ vcenter_address }}'
+      username: '{{ vcenter_username }}'
+      password: '{{ vcenter_password }}'     
+      validate_certs: no 
+      name: "{{vm_name}}"
+      keys_send: ENTER
+      string_send: "{{item}}"
+    delegate_to: localhost
+    loop: 
+      - "set diag -confirmations off" # cluster mgmt port
+      - "systemshell local bash"
+      - "ngsh -c \"add-node -cluster-ips $(ngsh -c 'show-discovered -fields address' | grep {{add_nodes_by_serial}}|cut -d' ' -f2)\""
+      - ""
+    when: 
+      - add_nodes_by_serial|default("") != "" 
+
+  - name: Wait 30 seconds for cluster setup
+    wait_for: timeout=30
+    delegate_to: localhost
+    when: 
+      - add_nodes_by_serial|default("") != "" 
+
+  - name: add-node-test
+    community.vmware.vmware_guest_sendkey:
+      hostname: '{{ vcenter_address }}'
+      username: '{{ vcenter_username }}'
+      password: '{{ vcenter_password }}'     
+      validate_certs: no 
+      name: "{{vm_name}}"
+      keys_send: ENTER
+      string_send: "{{item}}"
+    delegate_to: localhost
+    loop: 
+      - "exit"
+      - "set admin"
+      - "" # this is here to force the enter key after the preceding command
+    when: 
+      - add_nodes_by_serial|default("") != "" 
+      
   when: ontap_cluster_mgmt_ip != ""
+  #end block:
+
+
 
 
 

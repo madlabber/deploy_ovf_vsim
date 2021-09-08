@@ -1,7 +1,7 @@
 ---
 - name: remove if absent
   include_tasks: absent.yml
-  when: state == "absent"
+  when: state == "absent" or force
 
 - name: disk_model vha
   include_tasks: vha.yml

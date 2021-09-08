@@ -6,6 +6,7 @@ ovf_file:    "{{role_path}}/files/vsim-netapp-DOT{{ovf_version}}-cm_nodar.ova"
 state: "present"
 force: no
 console_muted: true
+#add_nodes_by_serial: ""
 
 # vSphere Information
 # vcenter_address: "vcenter.demo.lab"

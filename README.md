@@ -59,7 +59,7 @@ Role Variables
 | shelf3_disk_count       |                   |                                 | (1-14) Number of disks to create on shelf 3                                  |
 | shelf3_disk_size        |                   |                                 | valid sizes are 500,1000,2000,4000, or 9000                                  |
 | shelf3_disk_type        |                   |                                 | valid type from 'vsim_makedisks -h'. See defaults/main.yml for examples.     |
-
+| add_nodes_by_serial     |                   | "4034389-06-2"                  | serial number of a node to add into the cluster                              |
 
 Dependencies
 ------------
