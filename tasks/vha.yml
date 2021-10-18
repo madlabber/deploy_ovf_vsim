@@ -158,9 +158,10 @@
     hardware:
       memory_mb: "{{ vm_memory_mb}}"
       num_cpus: '{{ vm_num_cpus }}'
-    customvalues:
-      - key: pciHole.start
-        value: 1024  # Moving the PCI hole here gives ONTAP access to more system ram
+    # this broke in ansible 2.10
+    # customvalues:
+    #   - key: pciHole.start
+    #     value: 1024  # Moving the PCI hole here gives ONTAP access to more system ram
   delegate_to: localhost
 
 # This wierdness is because with_sequence evaluates and fails even when this task is not executed
