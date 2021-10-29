@@ -353,7 +353,6 @@
     - "{{ontap_password}}"
     - "" # this completes the node setup phase  
   when: 
-    - set_admin_password
     - ontap_cluster_mgmt_ip is undefined or ontap_cluster_mgmt_ip == ""
 
 - name: 'Run cluster setup on {{vm_name}}'
