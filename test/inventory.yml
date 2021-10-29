@@ -11,12 +11,12 @@ all:
     vsims:
       hosts:
         demo-01:
-          sys_serial_number:        "4082368-50-7"          
+          sys_serial_number:     "4082368-50-7"          
           ontap_node_mgmt_ip:    192.168.0.91
           ontap_cluster_name:    demo
           ontap_cluster_mgmt_ip: 192.168.0.90
         demo-02:
-          sys_serial_number:        "4034389-06-2"          
+          sys_serial_number:     "4034389-06-2"          
           ontap_node_mgmt_ip:    192.168.0.92
           set_admin_password:    true
       vars:

@@ -68,10 +68,9 @@ Dependencies
 
 Example Playbook
 ----------------
-    # deploy a single node cluster
     ---
     - hosts: localhost 
-      name: Build ONTAP Simulator from OVA
+      name: Deploy a single node ONTAP Simulator cluster
       gather_facts: false
       vars: 
         vcenter_address:  vcenter.demo.lab
@@ -83,17 +82,17 @@ Example Playbook
         - include_role: 
             name: deploy_ovf_vsim
           vars:
-            vm_name: vsim1
-            vm_datastore: "datastore1"
-            ontap_node_mgmt_ip: "192.168.0.81"
-            ontap_netmask: "255.255.255.0"
-            ontap_gateway: "192.168.0.1"
+            vm_name:               "vsim1-01"
+            vm_datastore:          "datastore1"
+            ontap_node_mgmt_ip:    "192.168.0.81"
+            ontap_netmask:         "255.255.255.0"
+            ontap_gateway:         "192.168.0.1"
+            ontap_cluster_name     "vsim1" 
             ontap_cluster_mgmt_ip: "192.168.0.80"
-      
-    # deploy a 2-node cluster
+            
     ---
     - hosts: localhost 
-      name: Build ONTAP Simulator from OVA
+      name: Deploy a 2-node ONTAP Simulator cluster
       gather_facts: false
       vars: 
         vcenter_address:  vcenter.demo.lab
@@ -128,6 +127,8 @@ Example Playbook
             ontap_node_mgmt_ip:    "192.168.0.91"
             ontap_netmask:         "255.255.255.0"
             ontap_gateway:         "192.168.0.1"
+            ontap_cluster_name     "vsim2" 
+            ontap_password:        "netapp123"
             ontap_cluster_mgmt_ip: "192.168.0.90"    
 
 
