@@ -68,7 +68,7 @@ Dependencies
 
 Example Playbook
 ----------------
-      
+    # deploy a single node cluster
     ---
     - hosts: localhost 
       name: Build ONTAP Simulator from OVA
@@ -85,11 +85,51 @@ Example Playbook
           vars:
             vm_name: vsim1
             vm_datastore: "datastore1"
-            ontap_node_mgmt_ip: "192.168.0.91"
+            ontap_node_mgmt_ip: "192.168.0.81"
             ontap_netmask: "255.255.255.0"
             ontap_gateway: "192.168.0.1"
-            ontap_cluster_mgmt_ip: "192.168.0.90"
+            ontap_cluster_mgmt_ip: "192.168.0.80"
       
+    # deploy a 2-node cluster
+    ---
+    - hosts: localhost 
+      name: Build ONTAP Simulator from OVA
+      gather_facts: false
+      vars: 
+        vcenter_address:  vcenter.demo.lab
+        vcenter_username: administrator@vsphere.local
+        vcenter_password: ChangeMe2!
+        vcenter_datacenter: "Datacenter"
+        vcenter_cluster:    "Cluster1"
+      tasks:
+        # Deploy the second node first
+        - include_role: 
+            name: deploy_ovf_vsim
+          vars:
+            vm_name:            "vsim2-02"  
+            vm_datastore:       "datastore1"
+            data_network:       "VM Network"
+            cluster_network:    "VM Network 2"
+            sys_serial_number:  "4034389-06-2"
+            ontap_node_mgmt_ip: "192.168.0.92"  
+            ontap_netmask:      "255.255.255.0"
+            ontap_gateway:      "192.168.0.1"
+      
+        # Deploy the first node last
+        - include_role: 
+            name: deploy_ovf_vsim
+          vars:
+            vm_name:               "vsim2-01"
+            vm_datastore:          "datastore1"
+            data_network:          "VM Network"
+            cluster_network:       "VM Network 2"
+            sys_serial_number:     "4082368-50-7"
+            add_nodes_by_serial:   "4034389-06-2"
+            ontap_node_mgmt_ip:    "192.168.0.91"
+            ontap_netmask:         "255.255.255.0"
+            ontap_gateway:         "192.168.0.1"
+            ontap_cluster_mgmt_ip: "192.168.0.90"    
+
 
 NOTES
 -----
