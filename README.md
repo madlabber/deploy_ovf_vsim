@@ -53,8 +53,8 @@ Role Variables
 | shelf1_disk_count       | "14"                | (1-14) Number of disks to create on shelf 1 |
 | shelf1_disk_size        | "4000"              | valid sizes are 500,1000,2000,4000, or 9000 |
 | shelf1_disk_type        |                     | valid type from 'vsim_makedisks -h'. See defaults/main.yml for examples. |
-| shelf2_disk_count       |                     | (1-14) Number of disks to create on shelf 2 |
-| shelf2_disk_size        | "14"                | valid sizes are 500,1000,2000,4000, or 9000 |
+| shelf2_disk_count       | "14"                | (1-14) Number of disks to create on shelf 2 |
+| shelf2_disk_size        |                     | valid sizes are 500,1000,2000,4000, or 9000 |
 | shelf2_disk_type        | "23"                | valid type from 'vsim_makedisks -h'. See defaults/main.yml for examples. |
 | shelf3_disk_count       |                     | (1-14) Number of disks to create on shelf 3 |
 | shelf3_disk_size        |                     | valid sizes are 500,1000,2000,4000, or 9000 |
@@ -89,7 +89,7 @@ Example Playbook
             ontap_gateway:         "192.168.0.1"
             ontap_cluster_name     "vsim1" 
             ontap_cluster_mgmt_ip: "192.168.0.80"
-            
+
     ---
     - hosts: localhost 
       name: Deploy a 2-node ONTAP Simulator cluster
