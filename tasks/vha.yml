@@ -302,7 +302,7 @@
   - name: Wait for 60 seconds for Startup to Complete
     wait_for: timeout=60
     delegate_to: localhost
-    when: ontap_node_mgmt_ip != "" 
+    when: ontap_node_mgmt_ip|default("") != "" 
 
   # Send keys via HID to complete setup at the vidconsole
   - name: Complete Node Setup
@@ -324,7 +324,7 @@
       - "{{ontap_netmask}}"
       - "{{ontap_gateway}}"
       - "" # this completes the node setup phase
-  when: ontap_node_mgmt_ip != ""
+  when: ontap_node_mgmt_ip|default("") != ""
 # block:end
 
 - name: 'set node admin password on {{vm_name}}'
@@ -521,7 +521,7 @@
     when: 
       - add_nodes_by_serial|default("") != "" 
 
-  when: ontap_cluster_mgmt_ip != ""
+  when: ontap_cluster_mgmt_ip|default("") != ""
   #end block:
 
 
