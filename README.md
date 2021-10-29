@@ -18,7 +18,7 @@ Role Variables
 
 | Variable                | **Default**/Example | Comments  |
 |-------------------------|---------------------|-----------|
-| state                   | **present**,absent" | present creates VMs, absent deletes them.   |
+|state                   |**present**,absent"|present creates VMs, absent deletes them.|
 | vm_name                 | **SimulateONTAP**   | a valid VM name |
 | **vm_datastore**        | **datastore1**      | the VMware datastore where the node will be placed |
 | data_network            | **"VM Network"**    | The vSphere portgroup used for ONTAP data and mgmt traffic |
@@ -59,6 +59,7 @@ Role Variables
 | shelf3_disk_count       |                     | (1-14) Number of disks to create on shelf 3 |
 | shelf3_disk_size        |                     | valid sizes are 500,1000,2000,4000, or 9000 |
 | shelf3_disk_type        |                     | valid type from 'vsim_makedisks -h'. See defaults/main.yml for examples. |
+| force                   | **False**, True     | If true, existing VMs will be deleted and recreated |
 
 
 Dependencies
