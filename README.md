@@ -138,6 +138,6 @@ add_nodes_by_serial only supports adding 1 additional node.
 Author Information
 ------------------
 
-Sean Hatfield
-sean.hatfield@netapp.com
-github.com/madlabber
+Sean Hatfield\
+sean.hatfield@netapp.com\
+github.com/madlabber\
