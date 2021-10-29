@@ -18,7 +18,7 @@ Role Variables
 
 | Variable                | **Default**/Example | Comments  |
 |-------------------------|---------------------|-----------|
-|state                   |**present**,absent"|present creates VMs, absent deletes them.|
+| state                   | **present**,absent  | present creates VMs, absent deletes them.|
 | vm_name                 | **SimulateONTAP**   | a valid VM name |
 | **vm_datastore**        | **datastore1**      | the VMware datastore where the node will be placed |
 | data_network            | **"VM Network"**    | The vSphere portgroup used for ONTAP data and mgmt traffic |
@@ -60,6 +60,7 @@ Role Variables
 | shelf3_disk_size        |                     | valid sizes are 500,1000,2000,4000, or 9000 |
 | shelf3_disk_type        |                     | valid type from 'vsim_makedisks -h'. See defaults/main.yml for examples. |
 | force                   | **False**, True     | If true, existing VMs will be deleted and recreated |
+| node_setup_delay        | **60**              | Seconds to wait before attempting node setup |
 
 
 Dependencies
@@ -73,16 +74,17 @@ Example Playbook
       name: Build ONTAP Simulator from OVA
       gather_facts: false
       vars: 
-        vcenter_address: vcenter.demo.lab
+        vcenter_address:  vcenter.demo.lab
         vcenter_username: administrator@vsphere.local
         vcenter_password: ChangeMe2!
         vcenter_datacenter: "Datacenter"
-        vm_datastore: "datastore1"
+        vcenter_cluster:    "Cluster1"
       tasks:
         - include_role: 
             name: deploy_ovf_vsim
           vars:
             vm_name: vsim1
+            vm_datastore: "datastore1"
             ontap_node_mgmt_ip: "192.168.0.91"
             ontap_netmask: "255.255.255.0"
             ontap_gateway: "192.168.0.1"
