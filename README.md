@@ -6,7 +6,7 @@ Deploys NetApp ONTAP Simulator (vsims) virtual appliances.
 Requirements
 ------------
 
-- Requires the vsim-netapp-DOT{{ovf_version}}-cm_nodar.ova virtual appliance downloaded from NetApp.com.  
+- Requires the vsim-netapp-DOT{{ ovf_version }}-cm_nodar.ova virtual appliance downloaded from NetApp.com.  
 Store the archive in either the role's files directory, or the playbook's files directory.
 
 - Requires the community.vmware ansible galaxy collection.
@@ -33,7 +33,7 @@ Role Variables
 | **vcenter_datacenter**  | "Datacenter 1"      | vCenter datacenter where the node will be deployed |
 | vcenter_cluster         |                     | |
 | ovf_version             | **"9.9.1"**         | The vsim OVF version|
-| ovf_file                | | default: "{{role_path}}/files/vsim-netapp-DOT{{ovf_version}}-cm_nodar.ova" |
+| ovf_file                | | default: "{{role_path}}/files/vsim-netapp-DOT{{ ovf_version }}-cm_nodar.ova" |
 | sys_serial_number       | **"4082368-50-7"**, "4034389-06-2" | must match an available license key set. |
 | nvram_sysid             | "4082368507"        | if omitted a random sysid will be used. |
 | vdevinit                | **"34:14:0,34:14:1"** | simulated disk configuration.  see vars/main.yml for details |
@@ -61,6 +61,14 @@ Role Variables
 | shelf3_disk_type        |                     | valid type from 'vsim_makedisks -h'. See defaults/main.yml for examples. |
 | force                   | **False**, True     | If true, existing VMs will be deleted and recreated |
 | node_setup_delay        | **60**              | Seconds to wait before attempting node setup |
+
+Default Configuration(s)
+------------------------  
+This role does some adjustments to the default config from NetApp:
+  * Default storage config:
+    * Populating the first 2 shelfs, resulting in 28 total drives
+    * Leveraging 4 GB FCAL style drives
+  * Expanded `aggr0` & `vol0` 
 
 
 Dependencies
@@ -90,6 +98,40 @@ Example Playbook
             ontap_cluster_name     "vsim1" 
             ontap_cluster_mgmt_ip: "192.168.0.80"
 
+    ---
+    - hosts: localhost 
+      name: Deploy a single node ONTAP Simulator cluster with additional storage
+      gather_facts: false
+      vars: 
+        vcenter_address:  vcenter.demo.lab
+        vcenter_username: administrator@vsphere.local
+        vcenter_password: ChangeMe2!
+        vcenter_datacenter: "Datacenter"
+        vcenter_cluster:    "Cluster1"
+      tasks:
+        - include_role: 
+            name: deploy_ovf_vsim
+          vars:
+            vm_name:               "vsim1-01"
+            vm_datastore:          "datastore1"
+            ontap_node_mgmt_ip:    "192.168.0.81"
+            ontap_netmask:         "255.255.255.0"
+            ontap_gateway:         "192.168.0.1"
+            ontap_cluster_name     "vsim1" 
+            ontap_cluster_mgmt_ip: "192.168.0.80"
+            shelf0_disk_count:     14  
+            shelf0_disk_size:      4000
+            shelf0_disk_type:      31 
+            shelf1_disk_count:     14  
+            shelf1_disk_size:      4000
+            shelf1_disk_type:      31
+            shelf2_disk_count:     14  
+            shelf2_disk_size:      4000
+            shelf2_disk_type:      31
+            shelf3_disk_count:     14  
+            shelf3_disk_size:      4000
+            shelf3_disk_type:      31  
+  
     ---
     - hosts: localhost 
       name: Deploy a 2-node ONTAP Simulator cluster
@@ -134,7 +176,11 @@ Example Playbook
 
 NOTES
 -----
-add_nodes_by_serial only supports adding 1 additional node.
+* Reference either `vsim_makedisks -h` or table comment in `defaults\main.yml` to adjust type, size, & count of disks
+* Leverage both the `data_network` & `cluster_network` for creating a 2 node cluster
+* setup second node first to leverage `add_nodes_by_serial`  
+* `add_nodes_by_serial` only supports adding 1 additional node
+
 
 Author Information
 ------------------
