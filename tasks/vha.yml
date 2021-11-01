@@ -283,7 +283,7 @@
     validate_certs: no 
     name: "{{ vm_name }}"
     keys_send: ENTER
-    string_send: "{{item}}"
+    string_send: "{{ item }}"
   delegate_to: localhost
   loop: 
     - "boot_ontap"
@@ -302,11 +302,11 @@
   register: result           
   until: result is succeeded 
 
-- name: 'Run node setup on {{vm_name}}'
+- name: 'Run node setup on {{ vm_name }}'
   block:
   # vmware tools come up a little early so we need to pause for a bit
-  - name: 'Wait for {{node_setup_delay|default(60)}} seconds for Startup to Complete'
-    wait_for: 'timeout={{node_setup_delay|default(60)}}'
+  - name: 'Wait for {{ node_setup_delay|default(60) }} seconds for Startup to Complete'
+    wait_for: 'timeout={{ node_setup_delay|default(60) }}'
     delegate_to: localhost
     when: ontap_node_mgmt_ip|default("") != "" 
 
@@ -319,7 +319,7 @@
       validate_certs: no 
       name: "{{ vm_name }}"
       keys_send: ENTER
-      string_send: "{{item}}"
+      string_send: "{{ item }}"
     delegate_to: localhost
     loop: 
       - "admin"
@@ -333,7 +333,7 @@
   when: ontap_node_mgmt_ip|default("") != ""
 # block:end
 
-- name: 'set node admin password on {{vm_name}}'
+- name: 'set node admin password on {{ vm_name }}'
   community.vmware.vmware_guest_sendkey:
     hostname: '{{ vcenter_address }}'
     username: '{{ vcenter_username }}'
@@ -341,7 +341,7 @@
     validate_certs: no 
     name: "{{ vm_name }}"
     keys_send: ENTER
-    string_send: "{{item}}"
+    string_send: "{{ item }}"
   delegate_to: localhost
   loop: 
     - "quit"
@@ -349,13 +349,13 @@
     - "login"
     - "password"
     - "" # at this point the admin password is blank
-    - "{{ontap_password}}"
-    - "{{ontap_password}}"
+    - "{{ ontap_password }}"
+    - "{{ ontap_password }}"
     - "" # this completes the node setup phase  
   when: 
     - ontap_cluster_mgmt_ip is undefined or ontap_cluster_mgmt_ip == ""
 
-- name: 'Run cluster setup on {{vm_name}}'
+- name: 'Run cluster setup on {{ vm_name }}'
   block:
   - name: Begin cluster setup
     community.vmware.vmware_guest_sendkey:
@@ -365,15 +365,15 @@
       validate_certs: no 
       name: "{{ vm_name }}"
       keys_send: ENTER
-      string_send: "{{item}}"
+      string_send: "{{ item }}"
     delegate_to: localhost
     loop: 
       - "create" # operation create|join
       - "no" # single node cluster yes|no
       - "yes" # use default cluster lif configuration
-      - "{{ontap_password}}"
-      - "{{ontap_password}}" # confirm password
-      - "{{ontap_cluster_name | default(vm_name) }}"
+      - "{{ ontap_password }}"
+      - "{{ ontap_password }}" # confirm password
+      - "{{ ontap_cluster_name | default(vm_name) }}"
       - "" # This is here to force the enter key to be pressed
 
   - name: Wait 120 seconds for cluster setup
@@ -386,18 +386,18 @@
       username: '{{ vcenter_username }}'
       password: '{{ vcenter_password }}'     
       validate_certs: no 
-      name: "{{vm_name}}"
+      name: "{{ vm_name }}"
       keys_send: ENTER
-      string_send: "{{item}}"
+      string_send: "{{ item }}"
     delegate_to: localhost
     loop: 
       - "e0c" # cluster mgmt port
-      - "{{ontap_cluster_mgmt_ip}}"
-      - "{{ontap_netmask}}"
-      - "{{ontap_gateway}}"
-      - "{{ontap_dns_domain}}" 
-      - "{{ontap_dns_server}}"
-      - "{{ontap_location}}" # single node cluster yes|no
+      - "{{ ontap_cluster_mgmt_ip }}"
+      - "{{ ontap_netmask }}"
+      - "{{ ontap_gateway }}"
+      - "{{ ontap_dns_domain }}" 
+      - "{{ ontap_dns_server }}"
+      - "{{ ontap_location }}" # single node cluster yes|no
       - "" # this is here to force the enter key after the preceding command
 
 #add_nodes_by_serial 
@@ -417,9 +417,9 @@
         username: '{{ vcenter_username }}'
         password: '{{ vcenter_password }}'     
         validate_certs: no 
-        name: "{{vm_name}}"
+        name: "{{ vm_name }}"
         keys_send: ENTER
-        string_send: "{{item}}"
+        string_send: "{{ item }}"
       delegate_to: localhost
       loop_control:
         pause: 5
@@ -432,7 +432,7 @@
         username: '{{ vcenter_username }}'
         password: '{{ vcenter_password }}'     
         validate_certs: no 
-        name: "{{vm_name}}"
+        name: "{{ vm_name }}"
         keys_send: ENTER
       delegate_to: localhost
 
@@ -446,8 +446,8 @@
         username: '{{ vcenter_username }}'
         password: '{{ vcenter_password }}'     
         validate_certs: no 
-        name: "{{vm_name}}"
-        string_send: "{{ontap_password}}"
+        name: "{{ vm_name }}"
+        string_send: "{{ ontap_password }}"
       delegate_to: localhost
 
     - name: press enter
@@ -456,7 +456,7 @@
         username: '{{ vcenter_username }}'
         password: '{{ vcenter_password }}'     
         validate_certs: no 
-        name: "{{vm_name}}"
+        name: "{{ vm_name }}"
         keys_send: ENTER
       delegate_to: localhost
 
@@ -473,9 +473,9 @@
       username: '{{ vcenter_username }}'
       password: '{{ vcenter_password }}'     
       validate_certs: no 
-      name: "{{vm_name}}"
+      name: "{{ vm_name }}"
       keys_send: ENTER
-      string_send: "{{item}}"
+      string_send: "{{ item }}"
     delegate_to: localhost
     loop_control:
       pause: 5
@@ -493,9 +493,9 @@
       username: '{{ vcenter_username }}'
       password: '{{ vcenter_password }}'     
       validate_certs: no 
-      name: "{{vm_name}}"
+      name: "{{ vm_name }}"
       keys_send: ENTER
-      string_send: "{{item}}"
+      string_send: "{{ item }}"
     delegate_to: localhost
     loop: 
       - "ngsh -c \"add-node -cluster-ips $(ngsh -c 'show-discovered -fields address' | grep {{add_nodes_by_serial}}|cut -d' ' -f2)\""
@@ -515,9 +515,9 @@
       username: '{{ vcenter_username }}'
       password: '{{ vcenter_password }}'     
       validate_certs: no 
-      name: "{{vm_name}}"
+      name: "{{ vm_name }}"
       keys_send: ENTER
-      string_send: "{{item}}"
+      string_send: "{{ item }}"
     delegate_to: localhost
     loop: 
       - "exit"
@@ -528,9 +528,4 @@
 
   when: ontap_cluster_mgmt_ip|default("") != ""
   #end block:
-
-
-
-
-
 
