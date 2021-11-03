@@ -13,6 +13,12 @@ Store the archive in either the role's files directory, or the playbook's files 
 
 - Requires pyvmoni.
 
+Installation
+------------
+
+`ansible-galaxy role install -f -p ./roles git+https://github.com/madlabber/deploy_ovf_vsim.git,main`
+
+
 Role Variables
 --------------
 
