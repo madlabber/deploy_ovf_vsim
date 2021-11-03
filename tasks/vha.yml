@@ -272,8 +272,8 @@
 # This prevents duplicate sysids from being used when the role is called
 # multiple times within a playbook's tasks section.
 - name: clear nvram_sysid
-    set_fact:
-      nvram_sysid: ""
+  set_fact:
+    nvram_sysid: ""
 
 - name: boot_ontap
   community.vmware.vmware_guest_sendkey:
