@@ -53,6 +53,7 @@ Role Variables
 | ontap_dns_server        |                     | DNS Server on the data/mgmt network |
 | ontap_location          |                     | optional ONTAP SNMP location value used for cluster setup |
 | add_nodes_by_serial     | "4034389-06-2"      | serial number of a node to add into the cluster |
+| disk_model              | **"vha"**, "vscsi"  | vha uses simulated disk, vscsi uses virtual disks |
 | shelf0_disk_count       | "14"                | (1-14) Number of disks to create on shelf 0 |
 | shelf0_disk_size        | "4000"              | valid sizes are 500,1000,2000,4000, or 9000 |
 | shelf0_disk_type        |                     | valid type from 'vsim_makedisks -h'. See defaults/main.yml for examples. |
