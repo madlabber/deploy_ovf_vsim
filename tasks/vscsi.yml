@@ -44,6 +44,12 @@
         value: "true"  # Required for vSCSI support
   delegate_to: localhost
 
+# This wierdness is because with_sequence evaluates and fails even when this task is not executed
+# bug closed as a wont_fix by ansible
+- name: add nics
+  include_tasks: add_nics.yml
+  when: vm_num_nics|int > 4
+  
 - name: Build Disk Shelf 0
   community.vmware.vmware_guest_disk:
     <<: *esxi_login
