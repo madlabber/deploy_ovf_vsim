@@ -194,7 +194,7 @@ Example Playbook
         vcenter_datacenter: "Datacenter"
         vcenter_cluster:    "Cluster1"
       tasks:
-        # Deploy the second node first
+        # In this scenario the partner node is deployed automatically
         - include_role: 
             name: deploy_ovf_vsim
           vars:
