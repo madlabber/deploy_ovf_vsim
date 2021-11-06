@@ -192,9 +192,12 @@
       keys_send: ENTER
       string_send: "ngsh -c \"add-node -cluster-ips $(ngsh -c 'show-discovered -fields address' | grep {{item}}|cut -d' ' -f2)\""
     delegate_to: localhost
-    loop: "{{add_nodes_by_serial}}"
+    with_items: "{{ add_nodes_by_serial.split(',') }}"
+    loop_control:
+      pause: 20
     when: 
       - add_nodes_by_serial|default("") != "" 
+
 
   - name: press enter
     community.vmware.vmware_guest_sendkey:
