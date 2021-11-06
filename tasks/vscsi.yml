@@ -201,6 +201,8 @@
     - "setenv bootarg.nvram.sysid {{nvram_sysid}}"
     # Enable dhcp for node_mgmt
     - "setenv bootarg.init.dhcp.disable false"
+    # Ensure cluster lifs are auto-generated
+    - "setenv bootarg.init.auto_cluster_lif.disable false"
     # Disable simulated disks
     - "setenv bootarg.vm.sim.vdevinit false"
     - "setenv bootarg.sim.vdevinit false"
@@ -215,11 +217,12 @@
     - "setenv bootarg.vm.checksum_type block"
     # ADP Settings
     - "setenv root-uses-shared-disks? {{adp_enabled|default('false')}}"
-    - "setenv allow-root-data1-data2-partitions? {{adp_enabled|default('false')}}"
+    - "setenv allow-root-data1-data2-partitions? {{adpv2_enabled|default('false')}}"
     # Trigger an automatic option 4
     - "setenv bootarg.bootmenu.allow_opts true"
     - "setenv bootarg.bootmenu.args 4a"
-    - "setenv bootarg.init.bootmenu true"
+    - "setenv bootarg.init.initnextV2 true"
+    - "setenv bootarg.init.wipeclean true"
     - ""
 
 - name: enable fake-ssd
@@ -234,9 +237,6 @@
   until: sendkeys_result is succeeded
   loop: 
     - "setenv wafl-idedupe-allow-lowend? true"
-    - "setenv allow-flash-optimized? true"
-    - "setenv bootarg.init.flash_optimized true"
-    - "setenv bootarg.vm.init.flash_optimized true"
     - "setenv allow-ssd-partitions? true"
     - "setenv fake-ssd {{ ((((fake_ssd_disk_size)-1/9)*8/9)|int)-6}}"
     - ""

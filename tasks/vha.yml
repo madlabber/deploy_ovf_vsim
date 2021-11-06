@@ -109,6 +109,8 @@
     - "setenv bootarg.init.wipeclean true"
     # make the node discoverable on the cluster network
     - "setenv bootarg.init.auto_cluster_lif.disable false"
+    # Enable dhcp for node_mgmt
+    - "setenv bootarg.init.dhcp.disable false"
     - "" # this is here to force the enter key after the preceding command
 
 - name: verbose console

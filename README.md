@@ -74,6 +74,7 @@ Role Variables
 | partner_ip              |                     | Partner node management IP address (vscsi only)|
 | fake_ssd_disk_size      |                     | Disk size to mark as fake SSD (vscsi only) |
 | adp_enabled             | **False**, True     | Enables advanced disk partitioning (vscsi only) |
+| adpv2_enabled           | **False**, True     | Enables ADPv2 Root-Data-Data partitioning (vscsi only) |
 
 
 Default Configuration(s)
