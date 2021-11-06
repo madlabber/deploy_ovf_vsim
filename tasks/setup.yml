@@ -196,15 +196,15 @@
     when: 
       - add_nodes_by_serial|default("") != "" 
 
-    - name: press enter
-      community.vmware.vmware_guest_sendkey:
-        hostname: '{{ vcenter_address }}'
-        username: '{{ vcenter_username }}'
-        password: '{{ vcenter_password }}'     
-        validate_certs: no 
-        name: "{{ vm_name }}"
-        keys_send: ENTER
-      delegate_to: localhost
+  - name: press enter
+    community.vmware.vmware_guest_sendkey:
+      hostname: '{{ vcenter_address }}'
+      username: '{{ vcenter_username }}'
+      password: '{{ vcenter_password }}'     
+      validate_certs: no 
+      name: "{{ vm_name }}"
+      keys_send: ENTER
+    delegate_to: localhost
 
   - name: Wait 30 seconds for command completion
     wait_for: timeout=30
