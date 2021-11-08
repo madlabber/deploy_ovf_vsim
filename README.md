@@ -52,7 +52,7 @@ Role Variables
 | ontap_dns_domain        |                     | DNS domain | 
 | ontap_dns_server        |                     | DNS Server on the data/mgmt network |
 | ontap_location          |                     | optional ONTAP SNMP location value used for cluster setup |
-| add_nodes_by_serial     | "4034389-06-2"      | comma sperated list of node serials to join to the cluster |
+| add_nodes_by_serial     | "4034389-06-2"      | serial number of a node to add into the cluster |
 | disk_model              | **"vha"**, "vscsi"  | vha uses simulated disk, vscsi uses virtual disks |
 | shelf0_disk_count       | "14"                | (1-14) Number of disks to create on shelf 0 |
 | shelf0_disk_size        | "4000"              | valid sizes are 500,1000,2000,4000, or 9000 |
@@ -75,7 +75,8 @@ Role Variables
 | fake_ssd_disk_size      |                     | Disk size to mark as fake SSD (vscsi only) |
 | adp_enabled             | **False**, True     | Enables advanced disk partitioning (vscsi only) |
 | adpv2_enabled           | **False**, True     | Enables ADPv2 Root-Data-Data partitioning (vscsi only) |
-
+| serial_ports            | **False**, True, <spec> | If true serial ports are created with a default backing spec.  If serial_ports contains a serial port backing spec, it will override the default|
+| partner_serial_ports    | **False**, True, <spec> | If true serial ports are created with a default backing spec.  If serial_ports contains a serial port backing spec, it will override the default|
 
 Default Configuration(s)
 ------------------------  
@@ -223,6 +224,8 @@ NOTES
 * Reference either `vsim_makedisks -h` or table comment in `defaults\main.yml` to adjust type, size, & count of disks
 * Leverage both the `data_network` & `cluster_network` for creating a 2 node cluster
 * setup second node first to leverage `add_nodes_by_serial`  
+* `add_nodes_by_serial` only supports adding 1 additional node
+
 
 Author Information
 ------------------
